@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Password Strength Checker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="assests/Website logo.png">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="flex flex-col items-center p-4">
+
+    <div class="glass-morphism rounded-2xl shadow-2xl p-8 w-full max-w-md slide-in">
+        <header class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mb-4">
+                <i class="fas fa-shield-alt text-white text-2xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Password Strength Checker</h1>
+            <p class="text-gray-600 text-sm">Create a strong, secure password with real-time feedback</p>
+        </header>
+
+        <main class="space-y-6">
+            <div class="relative">
+                <label for="password-input" class="block text-sm font-medium text-gray-700 mb-2">
+                    Enter Your Password
+                </label>
+                <div class="relative">
+                    <input 
+                        type="password" 
+                        id="password-input" 
+                        class="password-input w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition-all"
+                        placeholder="Type your password..."
+                        autocomplete="off"
+                    >
+                    <button 
+                        id="toggle-password" 
+                        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                        aria-label="Toggle password visibility"
+                    >
+                        <i class="fas fa-eye" id="toggle-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="strength-section" class="hidden space-y-4">
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-medium text-gray-700">Password Strength</span>
+                        <span id="strength-text" class="text-sm font-bold strength-indicator">Weak</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div id="strength-bar" class="progress-bar h-full rounded-full strength-weak" style="--strength: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3 flex items-center">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        Security Checklist
+                    </h3>
+                    <div id="checklist" class="space-y-2">
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="length">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>At least 8 characters long</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="uppercase">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>Contains uppercase letter</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="lowercase">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>Contains lowercase letter</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="numbers">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>Contains number</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="special">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>Contains special character</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="length12">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>At least 12 characters long (bonus)</span>
+                        </div>
+                        <div class="check-item flex items-center text-sm text-gray-600" data-rule="no-common">
+                            <i class="fas fa-circle mr-2 text-xs"></i>
+                            <span>Not a common password</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="feedback-section" class="bg-blue-50 border border-blue-200 rounded-lg p-4 hidden">
+                    <div class="flex items-start">
+                        <i class="fas fa-info-circle text-blue-500 mt-0.5 mr-2"></i>
+                        <div>
+                            <h4 class="text-sm font-semibold text-blue-800 mb-1">Suggestions</h4>
+                            <ul id="suggestions" class="text-sm text-blue-700 space-y-1">
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="empty-state" class="text-center py-8 text-gray-500">
+                <i class="fas fa-lock text-4xl mb-3 opacity-50"></i>
+                <p class="text-sm">Start typing to check your password strength</p>
+            </div>
+        </main>
+
+        <footer class="mt-8 pt-6 border-t border-gray-200">
+            <div class="flex items-center justify-center space-x-4 text-xs text-gray-500">
+                <span class="flex items-center">
+                    <i class="fas fa-shield-alt mr-1"></i>
+                    Secure
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-user-secret mr-1"></i>
+                    Private
+                </span>
+                <span class="flex items-center">
+                    <i class="fas fa-bolt mr-1"></i>
+                    Real-time
+                </span>
+            </div>
+        </footer>
+    </div>
+
+<!-- Success Section -->
+    <section class="success-section">
+
+        <!-- Wave Animation -->
+        <div class="wave-divider">
+            <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
+                <path
+                    fill="#f59e0b"
+                    d="M0,40 C120,20 240,60 360,50 480,40 600,10 720,20 840,30 960,60 1080,50 1200,40 1320,20 1440,30 L1440,100 L0,100 Z">
+                    <animate
+                        attributeName="d"
+                        dur="20s"
+                        repeatCount="indefinite"
+                        values="
+                        M0,40 C120,20 240,60 360,50 480,40 600,10 720,20 840,30 960,60 1080,50 1200,40 1320,20 1440,30 L1440,100 L0,100 Z;
+                        M0,50 C120,60 240,20 360,30 480,40 600,60 720,50 840,40 960,20 1080,30 1200,40 1320,60 1440,50 L1440,100 L0,100 Z;
+                        M0,40 C120,20 240,60 360,50 480,40 600,10 720,20 840,30 960,60 1080,50 1200,40 1320,20 1440,30 L1440,100 L0,100 Z
+                        "
+                    />
+                </path>
+            </svg>
+        </div>
+        <!-- Wave End -->
+
+        <div class="success-container">
+            <div class="success-content">
+                <div class="success-branding">
+                    <h2 class="success-title">Achievement</h2>
+                    <p class="success-subtitle">by Password Strength Checker Team</p>
+                </div>
+                <h3 class="success-heading">How we make your data more secure?</h3>
+                <p class="success-description">
+                    Strengthen your online security by using complex passwords, enabling two-factor authentication, and regularly updating your credentials to protect against unauthorized access.
+                </p>
+                <div class="success-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span class="feature-text">Accurate Tracking</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span class="feature-text">Detailed Analytics</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🏆</span>
+                        <span class="feature-text">Find Stronger Passwords</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pwStrengthChart">
+            <img src="assests/enhanced-pw-strength-chart.svg" alt="Password Strength Test Chart">
+        </div>
+    </section>
+
+<!-- Success Section Ends -->
+
+<!-- About / Technologies Used -->
+<section class="about-section">
+        <div class="about-container">
+            <h1>About Project</h1>
+            <p class="about-para">
+                Real-Time Password Strength Checker is a security tool designed to help users create stronger, more secure passwords. 
+                Using advanced algorithms, it provides instant feedback on password complexity and offers actionable suggestions to improve security.
+            </p>
+            
+            <div class="skills-grid">
+                <div class="skill-card">
+                    <i class="fab fa-html5 skill-icon"></i>
+                    <h3 class="skill-title">HTML5</h3>
+                    <p class="skill-desc">Semantic structure and accessibility</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fab fa-css3-alt skill-icon"></i>
+                    <h3 class="skill-title">CSS3</h3>
+                    <p class="skill-desc">Modern responsive design and animations</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fab fa-js skill-icon"></i>
+                    <h3 class="skill-title">JavaScript</h3>
+                    <p class="skill-desc">Real-time analysis logic</p>
+                </div>
+                <div class="skill-card">
+                    <i class="fas fa-shield-alt skill-icon"></i>
+                    <h3 class="skill-title">Security</h3>
+                    <p class="skill-desc">Client-side processing for privacy</p>
+                </div>
+            </div>
+
+            <div class="dev-profile">
+                <div class="dev-avatar">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <h2 class="dev-name">Atharv Pote</h2>
+                <p class="dev-role">Full Stack Developer</p>
+                <div class="social-links">
+                    <a href="https://github.com/Atharvpote14" target="_blank" class="social-link" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/atharv-pote-762964395?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" class="social-link" target="_blank" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="#" class="social-link" title="Portfolio">
+                        <i class="fas fa-globe"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<!-- Technologies Used End -->
+
+<!-- Footer -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <div class="footer-logo">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>SecurePass</span>
+                </div>
+                <p>Empowering users with real-time security insights for a safer digital experience. Your security is our priority.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Home</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>About Us</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Features</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-links">
+                <h3>Legal</h3>
+                <ul>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Privacy Policy</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Terms of Service</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Cookie Policy</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right text-xs mr-2"></i>Disclaimer</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-newsletter">
+                <h3>Stay Updated</h3>
+                <p>Get the latest security tips directly in your inbox.</p>
+                <div class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026  SecurePass. All rights reserved.</p>
+            <p>A Project by Atharv Pote</p>
+            <div class="footer-social">
+                <a href="https://www.facebook.com/share/1C5VHNjJns/" target="_blank" class="footer-social-link"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="footer-social-link"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="footer-social-link"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.linkedin.com/in/atharv-pote-762964395?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="footer-social-link"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+        </div>
+    </footer>
+<!-- Footer End -->
+
+    <script src="script.js"></script>
+</body>
+</html>
